@@ -121,3 +121,130 @@ console.log("异步请等我完成了再执行");
 文件已关闭
 ```
 
+### 4、简单文件写入
+
+简单文件写入也分同步+异步
+
+##### fs.writeFile(file, data[, options], callback)
+
+##### fs.writeFileSync(file, data[, options])
+
+​    -file 要操作的文件的路径
+​    -data 要写入的数据
+​    -options 选项，可以对写入进行一些设置(可选)
+​    -callback 当写入完成后执行的函数
+
+​	-flag   
+​    r 只读
+​    w 可写
+​    a 追加
+
+举例：
+
+```js
+var fs=require("fs");
+fs.writeFile("hello3.txt","这是第三个写入的文件",{flag:"w"},function (err){
+    if(!err){
+        console.log("写入成功");
+    }else{
+        console.log("error");
+    }
+})
+```
+
+
+
+### 5、打开状态
+
+| 模式 |                          说明                           |
+| :--: | :-----------------------------------------------------: |
+|  ★r  |            `读取`文件, 文件不存在则出现异常             |
+|  r+  |            `读写`文件, 文件不存在则出现异常             |
+|  rs  |              在同步模式下打开文件用于读取               |
+| rs+  |              在同步模式下打开文件用于读写               |
+|  ★w  | 打开文件用于写操作 , 如果不存在则创建，如果存在则`截断` |
+|  wx  |        打开文件用于写操作 , 如果 存在 则打开失败        |
+|  w+  |     打开文件用于读写如果不存在则创建如果存在则截断      |
+| wx+  |         打开文件用于读写 , 如果 存在 则打开失败         |
+|  ★a  |          打开文件用于`追加` , 如果不存在则创建          |
+|  ax  |          打开文件用于追加 , 如果路径存在则失败          |
+|  a+  |     打开文件进行读取和追加 , 如果不存在则创建该文件     |
+| ax+  |       打开文件进行读取和追加 , 如果路径存在则失败       |
+
+### 6、同步异步简单文件写入都不适合大文件的写入，性能较差，容易导致溢出，因此有了   流式文件写入
+
+```js
+var fs=require("fs");
+//流式文件写入
+//创建一个可写流
+/*
+fs.createWriteStream(path[,options])
+    -可以用来创建一个可写流
+    -path，文件路径
+    -options 配置的参数*/
+var ws=fs.createWriteStream("hello3.txt");
+//可以通过监听流的open和close事件来监听流的打开和关闭
+/*
+on(事件字符串，回调函数)
+-可以为对象绑定一个事件
+ once（事件字符串，回调函数）
+ -可以为对象绑定一个一次性事件，该事件会在触发一次后失效
+ */
+ws.once("open",function (){
+    console.log("流打开了");//打开只需要一次
+});
+ws.once("close",function (){
+    console.log("流关闭了");
+});
+//通过ws向文件中输出内容
+ws.write("通过可写流写入内容1");
+ws.write("通过可写流写入内容2");
+ws.write("通过可写流写入内容3");
+ws.write("通过可写流写入内容4");
+
+//关闭流
+ws.end();
+```
+
+输出：
+
+```txt
+流打开了
+流关闭了
+```
+
+hello3.txt:
+
+```txt
+通过可写流写入内容1通过可写流写入内容2通过可写流写入内容3通过可写流写入内容4
+```
+
+### 7、简单文件读取
+
+##### fs.readFIle(path[,options],callback)
+
+##### fs.readFileSync(path[,options])
+
+​    -path 要读取的文件的路径
+​    -options 读取的选项
+​    -callback 回调函数，通过回调函数将读取到的内容返回
+​        err 错误对象
+​        data  读取到的数据，会返回一个Buffer
+
+
+
+```js
+var fs=require("fs");
+fs.readFile("hello.txt",function (err,data){
+    if(!err){
+        // console.log(data);
+        //将data写入到文件中,下面的这个相当于复制操作
+        fs.writeFile("hello2.txt",data,function (err){
+            if(!err){
+                console.log("成功！");
+            }
+        })
+    }
+})
+```
+
