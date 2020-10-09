@@ -13,7 +13,7 @@ db.numbers.find({num:{$gt:40 , $lt:50}});
 //22.查询numbers中num大于19996的文档
 db.numbers.find({num:{$gt:19996}});
 
-//23.查看numbers集合中的前10条数据
+//23.查看numbers集合中的小于等于10的数据
 db.numbers.find({num:{$lte:10}});
 
 //limit()设置显示数据的上限
